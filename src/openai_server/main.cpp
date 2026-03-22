@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <getopt.h>
+#include <iomanip>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <random>
@@ -107,7 +108,8 @@ std::string newCompletionId()
     return "chatcmpl-" + std::to_string(sec) + "-" + std::to_string(dist(gen));
 }
 
-json buildChatCompletionResponse(std::string const& modelId, std::string const& content, std::string const& id)
+json buildChatCompletionResponse(std::string const& modelId, std::string const& content, std::string const& id,
+    int64_t completionTokens, double inferenceSeconds)
 {
     int64_t created = static_cast<int64_t>(std::time(nullptr));
     json choice;
@@ -115,13 +117,24 @@ json buildChatCompletionResponse(std::string const& modelId, std::string const& 
     choice["message"] = json{{"role", "assistant"}, {"content", sanitizeUtf8ForJson(content)}};
     choice["finish_reason"] = "stop";
 
-    return json{{"id", id},
+    json out{{"id", id},
         {"object", "chat.completion"},
         {"created", created},
         {"model", modelId},
         {"choices", json::array({choice})},
         {"usage",
-            {{"prompt_tokens", 0}, {"completion_tokens", 0}, {"total_tokens", 0}}}};
+            {{"prompt_tokens", 0},
+                {"completion_tokens", completionTokens},
+                {"total_tokens", completionTokens}}}};
+
+    // Wall-clock tokens/s over full handleRequest (prefill + decode). prompt_tokens 未统计，保持为 0。
+    if (inferenceSeconds > 0.0 && completionTokens > 0)
+    {
+        double const tps = static_cast<double>(completionTokens) / inferenceSeconds;
+        out["llm_on_edge"] = json{{"inference_time_sec", inferenceSeconds}, {"output_tokens_per_sec", tps}};
+    }
+
+    return out;
 }
 
 json buildModelsList(std::string const& modelId)
@@ -222,7 +235,12 @@ int main(int argc, char** argv)
         }
 
         trt_edgellm::rt::LLMGenerationResponse genResponse;
+        auto const inferT0 = std::chrono::steady_clock::now();
         bool ok = session->handleRequest(batches[0], genResponse);
+        auto const inferT1 = std::chrono::steady_clock::now();
+        double const inferenceSeconds
+            = std::chrono::duration<double>(inferT1 - inferT0).count();
+
         if (!ok || genResponse.outputTexts.empty())
         {
             res.status = 500;
@@ -231,9 +249,24 @@ int main(int argc, char** argv)
             return;
         }
 
+        int64_t completionTokens = 0;
+        if (!genResponse.outputIds.empty())
+        {
+            completionTokens = static_cast<int64_t>(genResponse.outputIds[0].size());
+        }
+
+        if (inferenceSeconds > 0.0 && completionTokens > 0)
+        {
+            double const tps = static_cast<double>(completionTokens) / inferenceSeconds;
+            std::cerr << "[llm_on_edge] completion_tokens=" << completionTokens << " inference_time_sec=" << std::fixed
+                      << std::setprecision(3) << inferenceSeconds << " output_tokens_per_sec=" << std::setprecision(2)
+                      << tps << "\n";
+        }
+
         std::string const& text = genResponse.outputTexts[0];
-        res.set_content(
-            buildChatCompletionResponse(args.model, text, newCompletionId()).dump(2), "application/json");
+        res.set_content(buildChatCompletionResponse(args.model, text, newCompletionId(), completionTokens, inferenceSeconds)
+                            .dump(2),
+            "application/json");
     });
 
     std::cout << "Listening on http://" << args.host << ":" << args.port << "\n";
