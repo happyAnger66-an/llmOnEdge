@@ -1,9 +1,9 @@
 # CuTe DSL FMHA（`fmha.py`）与 AOT 构建在 TensorRT-Edge-LLM 中的角色
 
-本文汇总 `kernelSrcs/fmha_cutedsl_blackwell/fmha.py` 的代码结构、技术要点，及其在 **TensorRT-Edge-LLM** 工程中的集成方式。源码以本仓库子模块为准：
+本文汇总 `kernelSrcs/fmha_cutedsl_blackwell/fmha.py` 的代码结构、技术要点，及其在 **TensorRT-Edge-LLM** 工程中的集成方式。路径相对于 llmOnEdge 的 **`third_party/TensorRT-Edge-LLM`**：
 
 - `third_party/TensorRT-Edge-LLM/kernelSrcs/fmha_cutedsl_blackwell/fmha.py`
-- 更完整的构建与集成说明见同目录 [`README.md`](../third_party/TensorRT-Edge-LLM/kernelSrcs/fmha_cutedsl_blackwell/README.md)
+- 更完整的构建与集成说明见上游目录 `kernelSrcs/fmha_cutedsl_blackwell/README.md`
 
 ---
 
@@ -178,7 +178,7 @@ fmha.py (构建期, --export_only)
 
 ---
 
-## 8. 相关文件索引（子模块内）
+## 8. 相关文件索引（上游仓库内）
 
 | 路径 | 说明 |
 |------|------|
@@ -192,4 +192,4 @@ fmha.py (构建期, --export_only)
 
 ---
 
-*文档随子模块版本变化；升级 `third_party/TensorRT-Edge-LLM` 后请对照上游 `README.md` 与 `limitations` 更新行为说明。*
+*文档随你本地的 TensorRT-Edge-LLM 版本变化；升级克隆后请对照上游 `README.md` 与 `limitations` 更新行为说明。*

@@ -165,20 +165,22 @@ HuggingFace 模型
 
 ---
 
-## 8. 参考链接与本仓库子模块
+## 8. 参考链接与子模块
 
-本仓库通过 **Git submodule**  vendoring 上游源码，路径为 **`third_party/TensorRT-Edge-LLM`**。克隆 llmOnEdge 后需执行：
+本仓库通过 **Git submodule** 引用上游源码，路径为 **`third_party/TensorRT-Edge-LLM`**。克隆后需执行：
 
 ```bash
-git submodule update --init --recursive
+git submodule update --init --recursive third_party/TensorRT-Edge-LLM
 ```
 
 - 上游仓库：<https://github.com/NVIDIA/TensorRT-Edge-LLM>
 - 文档站点：<https://nvidia.github.io/TensorRT-Edge-LLM/>
-- 开发者指南中的软件设计（相对本仓库：`third_party/TensorRT-Edge-LLM/docs/source/developer_guide/software-design/`）：
+- 下文及 `docs/` 中凡写 **`TensorRT-Edge-LLM/...`** 的路径，均相对于 `third_party/TensorRT-Edge-LLM`。
+- 开发者指南中的软件设计：`TensorRT-Edge-LLM/docs/source/developer_guide/software-design/`
   - `python-export-pipeline.md`
   - `engine-builder.md`
   - `cpp-runtime-overview.md`
   - `llm-inference-runtime.md`
   - `llm-inference-specdecode-runtime.md`
-- 插件与内核：`third_party/TensorRT-Edge-LLM/docs/source/developer_guide/customization/tensorrt-plugins.md`，以及同目录下 `kernelSrcs/fmha_v2`、`kernelSrcs/xqa` 等说明。
+- 插件与内核：`TensorRT-Edge-LLM/docs/source/developer_guide/customization/tensorrt-plugins.md`，以及同目录下 `kernelSrcs/fmha_v2`、`kernelSrcs/xqa` 等说明。
+- 本仓库对 **`cpp/plugins`** 的归纳说明见 [trt-plugin.md](trt-plugin.md)。

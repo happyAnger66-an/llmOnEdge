@@ -1,6 +1,6 @@
 # `llm_inference.cpp`：示例程序中的 LLM 推理流程与技术点
 
-本文分析 TensorRT-Edge-LLM 示例 [`third_party/TensorRT-Edge-LLM/examples/llm/llm_inference.cpp`](third_party/TensorRT-Edge-LLM/examples/llm/llm_inference.cpp)：它**不是**引擎内核实现，而是命令行驱动的 **端到端推理壳程序**，串联插件加载、JSON 请求解析、运行时构造、`handleRequest` 批处理、可选 **CUDA Graph** 捕获、性能剖析与结果落盘。
+本文分析 TensorRT-Edge-LLM 示例 `third_party/third_party/TensorRT-Edge-LLM/examples/llm/llm_inference.cpp`：它**不是**引擎内核实现，而是命令行驱动的 **端到端推理壳程序**，串联插件加载、JSON 请求解析、运行时构造、`handleRequest` 批处理、可选 **CUDA Graph** 捕获、性能剖析与结果落盘。
 
 ---
 
@@ -268,4 +268,4 @@ struct EagleArgs
 
 ---
 
-*源码路径相对于 llmOnEdge 仓库根目录：`third_party/TensorRT-Edge-LLM/examples/llm/llm_inference.cpp`。*
+*源码路径：`third_party/third_party/TensorRT-Edge-LLM/examples/llm/llm_inference.cpp`。*
