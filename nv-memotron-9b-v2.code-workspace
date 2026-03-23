@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../nv-memotron-9b-v2"
+		},
+		{
+			"path": "../vllm"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}

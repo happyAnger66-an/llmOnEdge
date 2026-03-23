@@ -13,13 +13,13 @@
 
 using json = nlohmann::json;
 
-TEST(OpenAiMapping, ValidateRejectsStream)
+TEST(OpenAiMapping, ValidateRejectsStreamUnlessPseudoEnabled)
 {
     json body;
     body["messages"] = json::array({{{"role", "user"}, {"content", "hi"}}});
     body["stream"] = true;
-    auto err = llm_on_edge::openai::validateChatCompletionBody(body);
-    ASSERT_TRUE(err.has_value());
+    EXPECT_TRUE(llm_on_edge::openai::validateChatCompletionBody(body, false).has_value());
+    EXPECT_FALSE(llm_on_edge::openai::validateChatCompletionBody(body, true).has_value());
 }
 
 TEST(OpenAiMapping, ValidateAcceptsMinimal)
@@ -27,6 +27,16 @@ TEST(OpenAiMapping, ValidateAcceptsMinimal)
     json body;
     body["messages"] = json::array({{{"role", "user"}, {"content", "hi"}}});
     EXPECT_FALSE(llm_on_edge::openai::validateChatCompletionBody(body).has_value());
+}
+
+TEST(OpenAiMapping, PseudoSseContainsChunksAndDone)
+{
+    std::string const sse = llm_on_edge::openai::buildPseudoChatCompletionSse(
+        "m", "chatcmpl-test", u8"\u4e2dab", 1); // 中 + a + b as separate deltas when cp=1
+    EXPECT_NE(sse.find("chat.completion.chunk"), std::string::npos);
+    EXPECT_NE(sse.find("[DONE]"), std::string::npos);
+    EXPECT_NE(sse.find("\"role\":\"assistant\""), std::string::npos);
+    EXPECT_NE(sse.find("data: "), std::string::npos);
 }
 
 TEST(OpenAiMapping, EdgeJsonParsesThroughLlmInputParse)

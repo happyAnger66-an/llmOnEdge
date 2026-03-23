@@ -34,6 +34,8 @@ struct ServerArgs
     std::string host{"0.0.0.0"};
     int port{8000};
     std::string model{"tensorrt-edgellm"};
+    /// When set, `stream: true` is accepted and returns SSE pseudo-streaming (full decode first, then chunked wire).
+    bool pseudoStream{false};
 };
 
 void printUsage(char const* argv0)
@@ -45,6 +47,7 @@ void printUsage(char const* argv0)
               << "  --host HOST                Bind address (default 0.0.0.0)\n"
               << "  --port N                   TCP port (default 8000)\n"
               << "  --model NAME               model id for /v1/models and responses (default tensorrt-edgellm)\n"
+              << "  --pseudo-stream            allow stream=true (protocol-compatible pseudo SSE; off by default)\n"
               << "  --help                     This message\n";
 }
 
@@ -57,7 +60,8 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
         MM_ENGINE_DIR = 1002,
         HOST = 1003,
         PORT = 1004,
-        MODEL = 1005
+        MODEL = 1005,
+        PSEUDO_STREAM = 1006
     };
     static struct option longOpts[] = {{"help", no_argument, nullptr, HELP},
         {"engine-dir", required_argument, nullptr, ENGINE_DIR},
@@ -65,6 +69,7 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
         {"host", required_argument, nullptr, HOST},
         {"port", required_argument, nullptr, PORT},
         {"model", required_argument, nullptr, MODEL},
+        {"pseudo-stream", no_argument, nullptr, PSEUDO_STREAM},
         {nullptr, 0, nullptr, 0}};
     int opt = 0;
     while ((opt = getopt_long(argc, argv, "", longOpts, nullptr)) != -1)
@@ -86,6 +91,7 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
             }
             break;
         case MODEL: out.model = optarg; break;
+        case PSEUDO_STREAM: out.pseudoStream = true; break;
         default: return false;
         }
     }
@@ -206,12 +212,14 @@ int main(int argc, char** argv)
             return;
         }
 
-        if (auto err = llm_on_edge::openai::validateChatCompletionBody(body))
+        if (auto err = llm_on_edge::openai::validateChatCompletionBody(body, args.pseudoStream))
         {
             res.status = 400;
             res.set_content(makeOpenAiError(*err).dump(), "application/json");
             return;
         }
+
+        bool const wantStream = body.value("stream", false);
 
         json edgeBody = llm_on_edge::openai::chatCompletionBodyToEdgeLlmJson(body);
 
@@ -264,8 +272,19 @@ int main(int argc, char** argv)
         }
 
         std::string const& text = genResponse.outputTexts[0];
-        res.set_content(buildChatCompletionResponse(args.model, text, newCompletionId(), completionTokens, inferenceSeconds)
-                            .dump(2),
+        std::string const cmplId = newCompletionId();
+
+        if (wantStream)
+        {
+            std::string const sse = llm_on_edge::openai::buildPseudoChatCompletionSse(
+                args.model, cmplId, sanitizeUtf8ForJson(text), 8);
+            res.set_header("Cache-Control", "no-cache");
+            res.set_content(sse, "text/event-stream");
+            return;
+        }
+
+        res.set_content(
+            buildChatCompletionResponse(args.model, text, cmplId, completionTokens, inferenceSeconds).dump(2),
             "application/json");
     });
 
