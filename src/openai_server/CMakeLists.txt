@@ -13,6 +13,7 @@ if(NOT cpphttplib_POPULATED)
   FetchContent_Populate(cpphttplib)
 endif()
 
+set(CMAKE_BUILD_TYPE Debug)
 add_library(cpphttplib INTERFACE)
 target_include_directories(cpphttplib SYSTEM INTERFACE ${cpphttplib_SOURCE_DIR})
 
@@ -64,4 +65,18 @@ if(LLMONEDGE_BUILD_OPENAI_SERVER_TESTS)
                                 ${EDGELLM_COMMON_INCLUDE_DIRS})
   target_link_libraries(openai_mapping_test PRIVATE gtest gtest_main llmOnEdgeInputParse)
   add_test(NAME openai_mapping_test COMMAND openai_mapping_test)
+
+  set(_LLMONEDGE_OPENAI_E2E_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/tests/e2e_openai_server_cli.cmake")
+  add_test(
+    NAME openai_server_e2e_cli_help
+    COMMAND ${CMAKE_COMMAND} -DBINARY_PATH=$<TARGET_FILE:llm_openai_server> -DCASE_NAME=help -P
+            ${_LLMONEDGE_OPENAI_E2E_SCRIPT})
+  add_test(
+    NAME openai_server_e2e_cli_invalid_log_level
+    COMMAND ${CMAKE_COMMAND} -DBINARY_PATH=$<TARGET_FILE:llm_openai_server> -DCASE_NAME=invalid_log_level -P
+            ${_LLMONEDGE_OPENAI_E2E_SCRIPT})
+  add_test(
+    NAME openai_server_e2e_cli_missing_engine_dir
+    COMMAND ${CMAKE_COMMAND} -DBINARY_PATH=$<TARGET_FILE:llm_openai_server> -DCASE_NAME=missing_engine_dir -P
+            ${_LLMONEDGE_OPENAI_E2E_SCRIPT})
 endif()

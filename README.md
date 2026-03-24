@@ -35,3 +35,7 @@ cmake -S . -B build \
   -DTRT_PACKAGE_DIR=... \
   -DLLMONEDGE_BUILD_OPENAI_SERVER=OFF
 ```
+
+```bash
+cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+```

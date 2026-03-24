@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../TensorRT-Edge-LLM"
+		},
+		{
+			"path": "../vllm"
+		}
+	],
+	"settings": {}
+}

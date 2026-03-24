@@ -7,6 +7,7 @@
 #include "llm_session.h"
 #include "openai_mapping.h"
 #include "profileFormatter.h"
+#include "common/logger.h"
 
 #include <httplib.h>
 
@@ -34,9 +35,42 @@ struct ServerArgs
     std::string host{"0.0.0.0"};
     int port{8000};
     std::string model{"tensorrt-edgellm"};
+    std::string logLevel{"info"};
+    bool noLog{false};
     /// When set, `stream: true` is accepted and returns SSE pseudo-streaming (full decode first, then chunked wire).
     bool pseudoStream{false};
 };
+
+nvinfer1::ILogger::Severity parseLogLevel(std::string const& logLevel)
+{
+    if (logLevel == "debug" || logLevel == "verbose")
+    {
+        return nvinfer1::ILogger::Severity::kVERBOSE;
+    }
+    if (logLevel == "info")
+    {
+        return nvinfer1::ILogger::Severity::kINFO;
+    }
+    if (logLevel == "warn" || logLevel == "warning")
+    {
+        return nvinfer1::ILogger::Severity::kWARNING;
+    }
+    if (logLevel == "error")
+    {
+        return nvinfer1::ILogger::Severity::kERROR;
+    }
+    throw std::invalid_argument("invalid log level");
+}
+
+void initLogger(ServerArgs const& args)
+{
+    if (args.noLog)
+    {
+        trt_edgellm::gLogger.setLevel(nvinfer1::ILogger::Severity::kERROR);
+        return;
+    }
+    trt_edgellm::gLogger.setLevel(parseLogLevel(args.logLevel));
+}
 
 void printUsage(char const* argv0)
 {
@@ -47,6 +81,8 @@ void printUsage(char const* argv0)
               << "  --host HOST                Bind address (default 0.0.0.0)\n"
               << "  --port N                   TCP port (default 8000)\n"
               << "  --model NAME               model id for /v1/models and responses (default tensorrt-edgellm)\n"
+              << "  --log-level LEVEL          debug|info|warn|error (default info)\n"
+              << "  --no-log                   disable non-error logs\n"
               << "  --pseudo-stream            allow stream=true (protocol-compatible pseudo SSE; off by default)\n"
               << "  --help                     This message\n";
 }
@@ -61,7 +97,9 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
         HOST = 1003,
         PORT = 1004,
         MODEL = 1005,
-        PSEUDO_STREAM = 1006
+        PSEUDO_STREAM = 1006,
+        LOG_LEVEL = 1007,
+        NO_LOG = 1008
     };
     static struct option longOpts[] = {{"help", no_argument, nullptr, HELP},
         {"engine-dir", required_argument, nullptr, ENGINE_DIR},
@@ -69,6 +107,8 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
         {"host", required_argument, nullptr, HOST},
         {"port", required_argument, nullptr, PORT},
         {"model", required_argument, nullptr, MODEL},
+        {"log-level", required_argument, nullptr, LOG_LEVEL},
+        {"no-log", no_argument, nullptr, NO_LOG},
         {"pseudo-stream", no_argument, nullptr, PSEUDO_STREAM},
         {nullptr, 0, nullptr, 0}};
     int opt = 0;
@@ -91,8 +131,21 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
             }
             break;
         case MODEL: out.model = optarg; break;
+        case LOG_LEVEL: out.logLevel = optarg; break;
+        case NO_LOG: out.noLog = true; break;
         case PSEUDO_STREAM: out.pseudoStream = true; break;
         default: return false;
+        }
+    }
+    if (!out.noLog)
+    {
+        try
+        {
+            static_cast<void>(parseLogLevel(out.logLevel));
+        }
+        catch (...)
+        {
+            return false;
         }
     }
     return true;
@@ -175,6 +228,7 @@ int main(int argc, char** argv)
         printUsage(argv[0]);
         return EXIT_FAILURE;
     }
+    initLogger(args);
 
     std::unique_ptr<llm_on_edge::openai::LlmEngineSession> session;
     try
