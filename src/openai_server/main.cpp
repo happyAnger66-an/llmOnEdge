@@ -37,6 +37,7 @@ struct ServerArgs
     std::string model{"tensorrt-edgellm"};
     std::string logLevel{"info"};
     bool noLog{false};
+    bool stripSpecial12Suffix{false};
     /// When set, `stream: true` is accepted and returns SSE pseudo-streaming (full decode first, then chunked wire).
     bool pseudoStream{false};
 };
@@ -72,6 +73,21 @@ void initLogger(ServerArgs const& args)
     trt_edgellm::gLogger.setLevel(parseLogLevel(args.logLevel));
 }
 
+std::string trimSpecial12Suffix(std::string text, bool enableTrim)
+{
+    if (!enableTrim)
+    {
+        return text;
+    }
+    static std::string const kSuffix = "\n<SPECIAL_12>\n";
+    if (text.size() >= kSuffix.size()
+        && text.compare(text.size() - kSuffix.size(), kSuffix.size(), kSuffix) == 0)
+    {
+        text.erase(text.size() - kSuffix.size());
+    }
+    return text;
+}
+
 void printUsage(char const* argv0)
 {
     std::cerr << "Usage: " << argv0 << " --engine-dir <path> [options]\n"
@@ -83,6 +99,7 @@ void printUsage(char const* argv0)
               << "  --model NAME               model id for /v1/models and responses (default tensorrt-edgellm)\n"
               << "  --log-level LEVEL          debug|info|warn|error (default info)\n"
               << "  --no-log                   disable non-error logs\n"
+              << "  --strip-special-12-suffix  trim trailing \\n<SPECIAL_12>\\n from model output\n"
               << "  --pseudo-stream            allow stream=true (protocol-compatible pseudo SSE; off by default)\n"
               << "  --help                     This message\n";
 }
@@ -99,7 +116,8 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
         MODEL = 1005,
         PSEUDO_STREAM = 1006,
         LOG_LEVEL = 1007,
-        NO_LOG = 1008
+        NO_LOG = 1008,
+        STRIP_SPECIAL_12_SUFFIX = 1009
     };
     static struct option longOpts[] = {{"help", no_argument, nullptr, HELP},
         {"engine-dir", required_argument, nullptr, ENGINE_DIR},
@@ -109,6 +127,7 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
         {"model", required_argument, nullptr, MODEL},
         {"log-level", required_argument, nullptr, LOG_LEVEL},
         {"no-log", no_argument, nullptr, NO_LOG},
+        {"strip-special-12-suffix", no_argument, nullptr, STRIP_SPECIAL_12_SUFFIX},
         {"pseudo-stream", no_argument, nullptr, PSEUDO_STREAM},
         {nullptr, 0, nullptr, 0}};
     int opt = 0;
@@ -133,6 +152,7 @@ bool parseServerArgs(int argc, char** argv, ServerArgs& out)
         case MODEL: out.model = optarg; break;
         case LOG_LEVEL: out.logLevel = optarg; break;
         case NO_LOG: out.noLog = true; break;
+        case STRIP_SPECIAL_12_SUFFIX: out.stripSpecial12Suffix = true; break;
         case PSEUDO_STREAM: out.pseudoStream = true; break;
         default: return false;
         }
@@ -325,7 +345,7 @@ int main(int argc, char** argv)
                       << tps << "\n";
         }
 
-        std::string const& text = genResponse.outputTexts[0];
+        std::string const text = trimSpecial12Suffix(genResponse.outputTexts[0], args.stripSpecial12Suffix);
         std::string const cmplId = newCompletionId();
 
         if (wantStream)
