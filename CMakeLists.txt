@@ -6,6 +6,11 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
 project(llmOnEdge LANGUAGES CXX CUDA)
 
+# clangd / clang-tidy：Ninja 与 Makefile 生成器会写出 compile_commands.json（含 tests 目标）
+if(NOT DEFINED CMAKE_EXPORT_COMPILE_COMMANDS)
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CUDA_STANDARD 17)
@@ -57,6 +62,10 @@ set(CURAND_KERNEL_INCLUDE_DIR "${CURAND_KERNEL_INCLUDE_DIR}" CACHE PATH "curand_
 
 option(LLMONEDGE_BUILD_OPENAI_SERVER "Build OpenAI-compatible HTTP server (llm_openai_server)" ON)
 option(LLMONEDGE_BUILD_OPENAI_SERVER_TESTS "Build gtest for openai_server JSON mapping" OFF)
+option(LLMONEDGE_ENABLE_TENSORRT "Build third_party TensorRT-Edge-LLM (requires TRT_PACKAGE_DIR)" ON)
+
+include(CTest)
+add_subdirectory(src/edgeLLM)
 
 macro(llm_onedge_cross_link target)
   if(DEFINED AARCH64_BUILD)
@@ -65,15 +74,16 @@ macro(llm_onedge_cross_link target)
   endif()
 endmacro()
 
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/TensorRT-Edge-LLM/CMakeLists.txt")
-  message(
-    FATAL_ERROR
-      "TensorRT-Edge-LLM missing. Initialize: git submodule update --init --recursive third_party/TensorRT-Edge-LLM")
+if(LLMONEDGE_ENABLE_TENSORRT)
+  if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/third_party/TensorRT-Edge-LLM/CMakeLists.txt")
+    message(
+      FATAL_ERROR
+        "TensorRT-Edge-LLM missing. Initialize: git submodule update --init --recursive third_party/TensorRT-Edge-LLM")
+  endif()
+  add_subdirectory(third_party/TensorRT-Edge-LLM)
 endif()
 
-add_subdirectory(third_party/TensorRT-Edge-LLM)
-
-if(LLMONEDGE_BUILD_OPENAI_SERVER)
+if(LLMONEDGE_BUILD_OPENAI_SERVER AND LLMONEDGE_ENABLE_TENSORRT)
   add_subdirectory(src/llm_input_parse)
   add_subdirectory(src/openai_server)
 endif()

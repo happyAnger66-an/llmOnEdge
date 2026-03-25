@@ -1,0 +1,92 @@
+[
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -isystem /usr/local/cuda/targets/x86_64-linux/include -std=gnu++17 -fPIC -o src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/memory_types.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/memory_types.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/memory_types.cpp",
+  "output": "src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/memory_types.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -isystem /usr/local/cuda/targets/x86_64-linux/include -std=gnu++17 -fPIC -o src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/memory_stats.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/memory_stats.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/memory_stats.cpp",
+  "output": "src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/memory_stats.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -isystem /usr/local/cuda/targets/x86_64-linux/include -std=gnu++17 -fPIC -o src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/element_type.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/element_type.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/element_type.cpp",
+  "output": "src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/element_type.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -isystem /usr/local/cuda/targets/x86_64-linux/include -std=gnu++17 -fPIC -o src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/buffer.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/buffer.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/buffer.cpp",
+  "output": "src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/buffer.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -isystem /usr/local/cuda/targets/x86_64-linux/include -std=gnu++17 -fPIC -o src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/buffer_manager.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/buffer_manager.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/buffer_manager.cpp",
+  "output": "src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/buffer_manager.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -isystem /usr/local/cuda/targets/x86_64-linux/include -std=gnu++17 -fPIC -o src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/tensor.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/tensor.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/src/tensor.cpp",
+  "output": "src/edgeLLM/CMakeFiles/llmOnEdgeMemory.dir/src/tensor.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest -std=gnu++17 -o src/edgeLLM/CMakeFiles/edge_memory_unit_tests.dir/tests/unit/test_memory_stats.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit/test_memory_stats.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit/test_memory_stats.cpp",
+  "output": "src/edgeLLM/CMakeFiles/edge_memory_unit_tests.dir/tests/unit/test_memory_stats.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest -std=gnu++17 -o src/edgeLLM/CMakeFiles/edge_memory_unit_tests.dir/tests/unit/test_buffer.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit/test_buffer.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit/test_buffer.cpp",
+  "output": "src/edgeLLM/CMakeFiles/edge_memory_unit_tests.dir/tests/unit/test_buffer.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest -std=gnu++17 -o src/edgeLLM/CMakeFiles/edge_memory_unit_tests.dir/tests/unit/test_tensor.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit/test_tensor.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit/test_tensor.cpp",
+  "output": "src/edgeLLM/CMakeFiles/edge_memory_unit_tests.dir/tests/unit/test_tensor.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit -isystem /usr/local/cuda/targets/x86_64-linux/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest -std=gnu++17 -o src/edgeLLM/CMakeFiles/edge_memory_unit_tests.dir/tests/unit/test_buffer_manager.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit/test_buffer_manager.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/unit/test_buffer_manager.cpp",
+  "output": "src/edgeLLM/CMakeFiles/edge_memory_unit_tests.dir/tests/unit/test_buffer_manager.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/include -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests -I/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/e2e -isystem /usr/local/cuda/targets/x86_64-linux/include -std=gnu++17 -o src/edgeLLM/CMakeFiles/edge_memory_e2e.dir/tests/e2e/memory_e2e.cpp.o -c /home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/e2e/memory_e2e.cpp",
+  "file": "/home/zhangxa/codes/llmOnEdge/src/edgeLLM/tests/e2e/memory_e2e.cpp",
+  "output": "src/edgeLLM/CMakeFiles/edge_memory_e2e.dir/tests/e2e/memory_e2e.cpp.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googlemock/include -I/home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googlemock -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest -std=c++17 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o -c /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googlemock/src/gmock-all.cc",
+  "file": "/home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googlemock/src/gmock-all.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googlemock/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googlemock -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest -std=c++17 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o -c /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googlemock/src/gmock_main.cc",
+  "file": "/home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googlemock/src/gmock_main.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -I/home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/include -I/home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest -std=c++17 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "file": "/home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "output": "_deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o"
+},
+{
+  "directory": "/home/zhangxa/codes/llmOnEdge/build-edge-test",
+  "command": "/usr/bin/c++ -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/include -isystem /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest -std=c++17 -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "file": "/home/zhangxa/codes/llmOnEdge/build-edge-test/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "output": "_deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o"
+}
+]

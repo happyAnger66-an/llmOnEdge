@@ -61,6 +61,7 @@ if(LLMONEDGE_BUILD_OPENAI_SERVER_TESTS)
   add_executable(openai_mapping_test tests/test_openai_mapping.cpp openai_mapping.cpp)
   target_include_directories(
     openai_mapping_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+                                ${CMAKE_CURRENT_SOURCE_DIR}/tests
                                 ${CMAKE_CURRENT_SOURCE_DIR}/../llm_input_parse
                                 ${EDGELLM_COMMON_INCLUDE_DIRS})
   target_link_libraries(openai_mapping_test PRIVATE gtest gtest_main llmOnEdgeInputParse)
