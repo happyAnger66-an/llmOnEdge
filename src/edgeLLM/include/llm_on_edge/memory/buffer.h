@@ -37,6 +37,8 @@ public:
     [[nodiscard]] MemoryType memory_type() const noexcept { return m_type; }
     [[nodiscard]] int device_id() const noexcept { return m_device_id; }
 
+    [[nodiscard]] std::shared_ptr<MemoryStats> memory_stats() const noexcept { return m_stats; }
+
     /// Grow or shrink logical size; may reallocate if larger than capacity.
     void resize(std::size_t new_size_bytes);
 

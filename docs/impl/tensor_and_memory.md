@@ -87,9 +87,8 @@ llmOnEdge 首版可只实现 **GPU + Pinned + CPU** 三类的统计与分配；*
 
 - **按类型计数**（字节数，原子）：`current_gpu()`、`current_cpu()`、`current_pinned()`（与 TRT-LLM 的 `getGpu()` / `getCpu()` / `getPinned()` 对应）。
 - **最近一次操作增量**（可选，便于打一条 log）：`last_diff_gpu()` 等，在每次 `allocate`/`deallocate` 后更新。
-- **非单例 vs 单例**  
-  - **单例**（TRT-LLM 风格）：全进程一处 `getInstance()`，实现简单。  
-  - **可注入 `MemoryStats&`**：每个 `Session`/`Runtime` 独立统计，便于单测与多实例隔离；**推荐**在 llmOnEdge 中采用 **可注入 + 默认进程级实例**，兼顾测试与全局调试。
+- **进程内全局单例（实现）**：`MemoryStats::global()` 返回的实例全进程唯一；所有 **`BufferManager()` 默认构造**（`stats == nullptr`）均挂接到该实例，缓冲与 Tensor 存活统计自然汇总到一处。  
+- **可注入独立实例**：`BufferManager(std::make_shared<MemoryStats>(), …)` 仅建议在 **单测隔离** 等场景使用；业务代码若要「一处看全进程内存」，应统一使用 **`MemoryStats::global()`** 与默认 `BufferManager`。
 
 ### 4.2 更新时机
 
@@ -234,11 +233,11 @@ class IAllocator {
 | 组件 | 路径 |
 |------|------|
 | `MemoryType` / `memory_type_name` | `include/llm_on_edge/memory/memory_types.h`，`src/memory_types.cpp` |
-| `MemoryStats` | `include/llm_on_edge/memory/memory_stats.h`，`src/memory_stats.cpp` |
+| `MemoryStats` | `include/llm_on_edge/memory/memory_stats.h`，`src/memory_stats.cpp`（**`global()`** 为进程内唯一汇总；可选自建实例仅用于单测隔离） |
 | `ElementType` / `element_size` | `include/llm_on_edge/memory/element_type.h`，`src/element_type.cpp` |
 | `Buffer` | `include/llm_on_edge/memory/buffer.h`，`src/buffer.cpp` |
 | `BufferManager` | `include/llm_on_edge/memory/buffer_manager.h`，`src/buffer_manager.cpp` |
-| `Tensor` | `include/llm_on_edge/memory/tensor.h`，`src/tensor.cpp` |
+| `Tensor` | `include/llm_on_edge/memory/tensor.h`，`src/tensor.cpp`（推荐 `Tensor(manager, shape, element_type[, memory_type])`；存活 Tensor 见 `MemoryStats::live_tensor_*`；默认 `BufferManager` 挂 `MemoryStats::global()`） |
 | CUDA 错误宏 | `include/llm_on_edge/memory/cuda_check.h` |
 
 CMake 目标：**`llmOnEdgeMemory`**（静态库）。测试：`edge_memory_unit_tests`（GoogleTest）、**`edge_memory_e2e`**（端到端 H2D/D2H + `Tensor`）。

@@ -11,6 +11,26 @@
 namespace llm_on_edge::memory
 {
 
+std::shared_ptr<MemoryStats> MemoryStats::global() noexcept
+{
+    static std::shared_ptr<MemoryStats> const s = std::make_shared<MemoryStats>();
+    return s;
+}
+
+void MemoryStats::tensor_live_add(SizeType bytes) noexcept
+{
+    m_tensors_bytes.fetch_add(bytes, std::memory_order_relaxed);
+    m_tensors_count.fetch_add(1, std::memory_order_relaxed);
+    m_last_diff_tensors_bytes.store(static_cast<DiffType>(bytes), std::memory_order_relaxed);
+}
+
+void MemoryStats::tensor_live_remove(SizeType bytes) noexcept
+{
+    m_tensors_bytes.fetch_sub(bytes, std::memory_order_relaxed);
+    m_tensors_count.fetch_sub(1, std::memory_order_relaxed);
+    m_last_diff_tensors_bytes.store(-static_cast<DiffType>(bytes), std::memory_order_relaxed);
+}
+
 void MemoryStats::bump(MemoryType t, DiffType delta) noexcept
 {
     switch (t)
@@ -59,7 +79,8 @@ std::string MemoryStats::to_string() const
 {
     std::ostringstream oss;
     oss << "MemoryStats{gpu=" << bytes_to_string(current_gpu()) << " cpu=" << bytes_to_string(current_cpu())
-        << " pinned=" << bytes_to_string(current_pinned()) << "}";
+        << " pinned=" << bytes_to_string(current_pinned()) << " tensors=" << bytes_to_string(live_tensor_bytes())
+        << " tensor_count=" << live_tensor_count() << "}";
     return oss.str();
 }
 

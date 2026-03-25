@@ -14,7 +14,8 @@
 namespace llm_on_edge::memory
 {
 
-/// Central factory for buffers + copies (TRT-LLM BufferManager style). Holds shared MemoryStats.
+/// Central factory for buffers + copies (TRT-LLM BufferManager style).
+/// `stats == nullptr` 时使用 `MemoryStats::global()`，全进程共一份统计。
 class BufferManager
 {
 public:

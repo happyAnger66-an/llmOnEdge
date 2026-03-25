@@ -17,7 +17,7 @@ namespace llm_on_edge::memory
 {
 
 BufferManager::BufferManager(std::shared_ptr<MemoryStats> stats, int device_id)
-    : m_stats(stats ? std::move(stats) : std::make_shared<MemoryStats>())
+    : m_stats(stats ? std::move(stats) : MemoryStats::global())
     , m_device_id(device_id)
 {
 }

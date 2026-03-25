@@ -4,6 +4,8 @@
 
 #include "llm_on_edge/memory/tensor.h"
 
+#include "llm_on_edge/memory/buffer_manager.h"
+
 #include <numeric>
 
 namespace llm_on_edge::memory
@@ -30,6 +32,22 @@ std::int64_t volume(std::vector<int64_t> const& shape)
 }
 } // namespace
 
+Tensor::Tensor(BufferManager& manager, std::vector<int64_t> shape, ElementType element_type, MemoryType memory_type)
+    : m_shape(std::move(shape))
+    , m_element_type(element_type)
+{
+    std::int64_t const v = volume(m_shape);
+    std::size_t const bytes = static_cast<std::size_t>(v) * element_size(m_element_type);
+
+    switch (memory_type)
+    {
+    case MemoryType::kGPU: m_buffer = manager.gpu(bytes); break;
+    case MemoryType::kCPU: m_buffer = manager.cpu(bytes); break;
+    case MemoryType::kPINNED: m_buffer = manager.pinned(bytes); break;
+    }
+    register_tensor();
+}
+
 Tensor::Tensor(Buffer::SharedPtr buffer, std::vector<int64_t> shape, ElementType element_type)
     : m_buffer(std::move(buffer))
     , m_shape(std::move(shape))
@@ -43,6 +61,56 @@ Tensor::Tensor(Buffer::SharedPtr buffer, std::vector<int64_t> shape, ElementType
     if (need != m_buffer->size_bytes())
     {
         throw std::invalid_argument("Tensor: shape * element_size != buffer size");
+    }
+    register_tensor();
+}
+
+Tensor::~Tensor()
+{
+    unregister_tensor();
+}
+
+Tensor::Tensor(Tensor&& other) noexcept
+    : m_buffer(std::move(other.m_buffer))
+    , m_shape(std::move(other.m_shape))
+    , m_element_type(other.m_element_type)
+{
+}
+
+Tensor& Tensor::operator=(Tensor&& other) noexcept
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+    unregister_tensor();
+    m_buffer = std::move(other.m_buffer);
+    m_shape = std::move(other.m_shape);
+    m_element_type = other.m_element_type;
+    return *this;
+}
+
+void Tensor::register_tensor()
+{
+    if (!m_buffer)
+    {
+        return;
+    }
+    if (auto s = m_buffer->memory_stats())
+    {
+        s->tensor_live_add(m_buffer->size_bytes());
+    }
+}
+
+void Tensor::unregister_tensor()
+{
+    if (!m_buffer)
+    {
+        return;
+    }
+    if (auto s = m_buffer->memory_stats())
+    {
+        s->tensor_live_remove(m_buffer->size_bytes());
     }
 }
 

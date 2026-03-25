@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * End-to-end: BufferManager + Tensor + H2D/D2H + stats (requires CUDA).
+ * End-to-end: BufferManager + Tensor(shape,type) + H2D/D2H + stats (requires CUDA).
  */
 
 #include "llm_on_edge/memory/buffer_manager.h"
@@ -10,8 +10,6 @@
 
 #include <cuda_runtime.h>
 
-#include <cstdlib>
-#include <cstring>
 #include <iostream>
 
 using namespace llm_on_edge::memory;
@@ -33,32 +31,30 @@ int main()
 
         std::cout << "[edge_memory_e2e] " << stats->to_string() << "\n";
 
-        // Tensor float32 [2, 4] = 8 floats = 32 bytes
         constexpr int64_t rows = 2;
         constexpr int64_t cols = 4;
-        std::size_t const bytes = static_cast<std::size_t>(rows * cols) * element_size(ElementType::kFloat32);
 
-        auto host = mgr.pinned(bytes);
-        auto dev = mgr.gpu(bytes);
-        float* h = static_cast<float*>(host->data());
+        Tensor t_host(mgr, {rows, cols}, ElementType::kFloat32, MemoryType::kPINNED);
+        float* h = static_cast<float*>(t_host.buffer()->data());
         for (int i = 0; i < rows * cols; ++i)
         {
             h[i] = static_cast<float>(i);
         }
 
-        Tensor tensor(host, {rows, cols}, ElementType::kFloat32);
-        if (tensor.num_elements() != static_cast<std::size_t>(rows * cols))
+        if (t_host.num_elements() != static_cast<std::size_t>(rows * cols))
         {
             std::cerr << "[edge_memory_e2e] FAIL: tensor elements\n";
             return 2;
         }
 
-        auto host_out = mgr.pinned(bytes);
-        mgr.copy(*host, *dev, nullptr);
-        mgr.copy(*dev, *host_out, nullptr);
+        Tensor t_dev(mgr, {rows, cols}, ElementType::kFloat32, MemoryType::kGPU);
+        Tensor t_out(mgr, {rows, cols}, ElementType::kFloat32, MemoryType::kPINNED);
+
+        mgr.copy(*t_host.buffer(), *t_dev.buffer(), nullptr);
+        mgr.copy(*t_dev.buffer(), *t_out.buffer(), nullptr);
         LLMONEDGE_CUDA_CHECK(cudaDeviceSynchronize());
 
-        float const* out = static_cast<float const*>(host_out->data());
+        float const* out = static_cast<float const*>(t_out.buffer()->data());
         for (int i = 0; i < rows * cols; ++i)
         {
             if (out[i] != h[i])
