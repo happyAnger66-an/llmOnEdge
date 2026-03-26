@@ -42,6 +42,21 @@ std::int64_t volume(std::vector<int64_t> const& shape)
 }
 } // namespace
 
+Tensor Tensor::cpu(std::vector<int64_t> shape, ElementType element_type)
+{
+    return Tensor(std::move(shape), element_type, MemoryType::kCPU);
+}
+
+Tensor Tensor::pinned(std::vector<int64_t> shape, ElementType element_type)
+{
+    return Tensor(std::move(shape), element_type, MemoryType::kPINNED);
+}
+
+Tensor Tensor::gpu(std::vector<int64_t> shape, ElementType element_type)
+{
+    return Tensor(std::move(shape), element_type, MemoryType::kGPU);
+}
+
 Tensor::Tensor(std::vector<int64_t> shape, ElementType element_type, MemoryType memory_type)
     : Tensor(global_buffer_manager(), std::move(shape), element_type, memory_type)
 {
@@ -159,6 +174,21 @@ Tensor Tensor::copy_to(BufferManager& manager, MemoryType memory_type, cudaStrea
 Tensor Tensor::copy_to(MemoryType memory_type, cudaStream_t stream) const
 {
     return copy_to(global_buffer_manager(), memory_type, stream);
+}
+
+Tensor Tensor::copy_to_cpu(cudaStream_t stream) const
+{
+    return copy_to(MemoryType::kCPU, stream);
+}
+
+Tensor Tensor::copy_to_pinned(cudaStream_t stream) const
+{
+    return copy_to(MemoryType::kPINNED, stream);
+}
+
+Tensor Tensor::copy_to_gpu(cudaStream_t stream) const
+{
+    return copy_to(MemoryType::kGPU, stream);
 }
 
 void Tensor::copy_to(Tensor& dst, BufferManager const& manager, cudaStream_t stream) const

@@ -127,6 +127,30 @@ TEST(Tensor, CopyToWithoutManagerAndSetFromWithoutManager)
     }
 }
 
+TEST(Tensor, QuickFactoriesAndCopyHelpers)
+{
+    Tensor a = Tensor::cpu({4}, ElementType::kUInt8);
+    auto* pa = static_cast<std::uint8_t*>(a.buffer()->data());
+    for (std::size_t i = 0; i < 4; ++i)
+    {
+        pa[i] = static_cast<std::uint8_t>(20 + i);
+    }
+
+    Tensor b = a.copy_to_pinned();
+    auto const* pb = static_cast<std::uint8_t const*>(b.buffer()->data());
+    for (std::size_t i = 0; i < 4; ++i)
+    {
+        EXPECT_EQ(pb[i], pa[i]);
+    }
+
+    Tensor c = b.copy_to_cpu();
+    auto const* pc = static_cast<std::uint8_t const*>(c.buffer()->data());
+    for (std::size_t i = 0; i < 4; ++i)
+    {
+        EXPECT_EQ(pc[i], pa[i]);
+    }
+}
+
 TEST(Tensor, SetZeroCpu)
 {
     BufferManager mgr;

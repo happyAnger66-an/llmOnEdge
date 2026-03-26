@@ -25,6 +25,11 @@ class BufferManager;
 class Tensor
 {
 public:
+    /// TRT-LLM style quick factories using process-global BufferManager.
+    [[nodiscard]] static Tensor cpu(std::vector<int64_t> shape, ElementType element_type);
+    [[nodiscard]] static Tensor pinned(std::vector<int64_t> shape, ElementType element_type);
+    [[nodiscard]] static Tensor gpu(std::vector<int64_t> shape, ElementType element_type);
+
     /// Allocates storage via process-global BufferManager (MemoryStats::global()).
     Tensor(std::vector<int64_t> shape, ElementType element_type, MemoryType memory_type = MemoryType::kCPU);
 
@@ -60,6 +65,9 @@ public:
 
     /// Allocate a new tensor and copy content into it.
     [[nodiscard]] Tensor copy_to(MemoryType memory_type, cudaStream_t stream = nullptr) const;
+    [[nodiscard]] Tensor copy_to_cpu(cudaStream_t stream = nullptr) const;
+    [[nodiscard]] Tensor copy_to_pinned(cudaStream_t stream = nullptr) const;
+    [[nodiscard]] Tensor copy_to_gpu(cudaStream_t stream = nullptr) const;
 
     /// Allocate a new tensor and copy content into it.
     [[nodiscard]] Tensor copy_to(BufferManager& manager, MemoryType memory_type, cudaStream_t stream = nullptr) const;

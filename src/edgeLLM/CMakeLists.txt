@@ -13,6 +13,13 @@ target_include_directories(llmOnEdgeMemory PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 target_link_libraries(llmOnEdgeMemory PUBLIC CUDA::cudart)
 set_target_properties(llmOnEdgeMemory PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+find_library(NVINFER_LIB nvinfer REQUIRED)
+
+add_library(llmOnEdgeEngine STATIC src/engine_runner.cpp)
+target_include_directories(llmOnEdgeEngine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(llmOnEdgeEngine PUBLIC llmOnEdgeMemory ${NVINFER_LIB})
+set_target_properties(llmOnEdgeEngine PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 option(LLMONEDGE_BUILD_EDGE_LLM_TESTS "Build edgeLLM memory unit tests and e2e" ON)
 
 if(LLMONEDGE_BUILD_EDGE_LLM_TESTS)
@@ -33,8 +40,9 @@ if(LLMONEDGE_BUILD_EDGE_LLM_TESTS)
     tests/unit/test_memory_stats.cpp
     tests/unit/test_buffer.cpp
     tests/unit/test_tensor.cpp
-    tests/unit/test_buffer_manager.cpp)
-  target_link_libraries(edge_memory_unit_tests PRIVATE llmOnEdgeMemory GTest::gtest_main CUDA::cudart)
+    tests/unit/test_buffer_manager.cpp
+    tests/unit/test_engine_runner.cpp)
+  target_link_libraries(edge_memory_unit_tests PRIVATE llmOnEdgeMemory llmOnEdgeEngine GTest::gtest_main CUDA::cudart)
   target_include_directories(
     edge_memory_unit_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/tests
                                    ${CMAKE_CURRENT_SOURCE_DIR}/tests/unit)
