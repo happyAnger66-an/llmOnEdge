@@ -39,3 +39,60 @@ cmake -S . -B build \
 ```bash
 cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ```
+
+## 开启 CuTe DSL FMHA（编译执行 `fmha.py`）
+
+`third_party/TensorRT-Edge-LLM` 中的 `fmha.py` 会在 CMake 构建阶段由
+`cmake/CuteDslFMHA.cmake` 自动调用（生成 `fmha_*.o/.h`）。
+
+### 1) 推荐方式：通过 CMake 自动触发
+
+建议先启用 Python 虚拟环境（避免把依赖装到系统 Python）：
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+配置与构建：
+
+```bash
+cmake -S . -B build-fmha -G Ninja \
+  -DTRT_PACKAGE_DIR=/path/to/TensorRT \
+  -DENABLE_CUTE_DSL_FMHA=ON
+
+cmake --build build-fmha -j
+```
+
+说明：
+- 该流程会自动检查/安装 `nvidia-cutlass-dsl` 与 `cupy`（版本由 `CuteDslFMHA.cmake` 按 CUDA 主版本选择）。
+- 需要在构建机上具备 Blackwell GPU（SM100/SM110）来编译该批内核。
+
+产物目录（自动生成）：
+`third_party/TensorRT-Edge-LLM/cpp/kernels/contextAttentionKernels/cuteDSLArtifact/`
+
+### 2) 手动单独执行 `fmha.py`（调试单变体）
+
+```bash
+cd third_party/TensorRT-Edge-LLM/kernelSrcs/fmha_cutedsl_blackwell
+
+python3 fmha.py \
+  --q_shape 1,1024,14,128 --k_shape 1,1024,1,128 \
+  --is_causal --is_persistent --bottom_right_align \
+  --export_only --output_dir ./out \
+  --file_name fmha_d128 --function_prefix fmha_d128
+```
+
+如需仅做参考正确性检查（不导出 `.o/.h`），去掉 `--export_only` 即可。
+
+### 3) 运行时回退到 FMHA_v2（可选）
+
+```bash
+export DISABLE_CUTE_DSL_FMHA=1
+```
+
+取消回退：
+
+```bash
+unset DISABLE_CUTE_DSL_FMHA
+```
